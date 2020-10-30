@@ -14,7 +14,6 @@ socket.on("userDisconnected", (message) => {
 
 socket.on("userMessage", (message) => {
 	console.log(message);
-	//document.querySelector("#userMessage").innerHTML = message;
 });
 
 document.querySelector("#inputForm").addEventListener("submit", (e) => {
@@ -22,7 +21,13 @@ document.querySelector("#inputForm").addEventListener("submit", (e) => {
 
 	const message = document.querySelector("#message").value;
 
-	socket.emit("userMessage", message);
+	socket.emit("userMessage", message, (error) => {
+		if (error) {
+			return console.log(error);
+		}
+
+		console.log("Message delivered!");
+	});
 });
 
 document.querySelector("#send-location").addEventListener("click", () => {
@@ -31,6 +36,13 @@ document.querySelector("#send-location").addEventListener("click", () => {
 	}
 
 	navigator.geolocation.getCurrentPosition((position) => {
-		socket.emit("sendLocation", position.coords.latitude, position.coords.longitude);
+		socket.emit(
+			"sendLocation",
+			position.coords.latitude,
+			position.coords.longitude,
+			() => {
+				console.log("Location shared!");
+			}
+		);
 	});
 });
