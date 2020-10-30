@@ -10,6 +10,8 @@ const $messages = document.querySelector("#messages");
 // Templates=>
 
 const messageTemplates = document.querySelector("#message-template").innerHTML;
+const locationMessageTemplate = document.querySelector("#location-message-template")
+	.innerHTML;
 
 socket.on("message", (message) => {
 	const html = Mustache.render(messageTemplates, {
@@ -18,8 +20,16 @@ socket.on("message", (message) => {
 	$messages.insertAdjacentHTML("beforeend", html);
 });
 
-socket.on("newUser", (message) => {
-	console.log(message);
+socket.on("locationMessage", (url) => {
+	console.log(url);
+	const html = Mustache.render(locationMessageTemplate, {
+		url
+	});
+	$messages.insertAdjacentHTML("beforeend", html);
+});
+
+socket.on("newUser", (url) => {
+	console.log(url);
 });
 
 socket.on("userDisconnected", (message) => {
