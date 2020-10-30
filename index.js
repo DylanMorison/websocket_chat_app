@@ -33,6 +33,10 @@ io.on("connection", (socket) => {
 	socket.on("disconnect", () => {
 		io.emit("userDisconnected", "A user has left!");
 	});
+
+	socket.on("sendLocation", (lat, long) => {
+		io.emit("message", `https://google.com/maps?q=${lat},${long}`);
+	});
 });
 
 const port = process.env.PORT || 5000;
