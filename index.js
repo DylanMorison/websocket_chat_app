@@ -10,23 +10,25 @@ const io = socketio(server);
 const publicDirectoryPath = path.join(__dirname, "./public");
 app.use(express.static(publicDirectoryPath));
 
-let count = 0;
-
 /**
- * @param socket An oject that contains information about a new connection
- * !server (emit) -> client (recieve) - countUpdated
- * !client (emit) -> server (recieve) - increment
+ * @param connection: Whenever a new user connects io.on("connection", () => {}) is run
+ * @param socket: An oject that contains information about a new connection
  */
 
 io.on("connection", socket => {
 	console.log("New WebSocket connection");
 
-	socket.emit("countUpdated", count);
-
-	socket.on("increment", () => {
-		count++;
-		io.emit("countUpdated", count);
+	socket.emit("newUser", "Welcome New User!");
+	socket.on("userMessage", message => {
+		io.emit("userMessage", message);
 	});
+
+	// socket.emit("countUpdated", count);
+
+	// socket.on("increment", () => {
+	// 	count++;
+	// 	io.emit("countUpdated", count);
+	// });
 });
 
 const port = process.env.PORT || 5000;
