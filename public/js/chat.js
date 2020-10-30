@@ -6,7 +6,7 @@ socket.on("userMessage", (message) => {
 });
 document.querySelector("#inputForm").addEventListener("submit", (e) => {
 	e.preventDefault();
-	const message = document.querySelector("input").value;
+	const message = document.querySelector("#message").value;
 	console.log(message);
 	socket.emit("userMessage", message);
 });
