@@ -1,5 +1,13 @@
 const socket = io();
 
+socket.on("newUser", (message) => {
+	console.log(message);
+});
+
+socket.on("userDisconnected", (message) => {
+	console.log(message);
+});
+
 socket.on("userMessage", (message) => {
 	console.log(message);
 	document.querySelector("#userMessage").innerHTML = message;

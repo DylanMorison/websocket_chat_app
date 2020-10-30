@@ -15,20 +15,24 @@ app.use(express.static(publicDirectoryPath));
  * @param socket: An oject that contains information about a new connection
  */
 
-io.on("connection", socket => {
+io.on("connection", (socket) => {
+	/**
+	 * @param socket.emit: emits to connection instancec
+	 * @param socket.broadcast.emit: emits to everyone but current connection instance
+	 * @param io.emit: emits to all connections
+	 */
 	console.log("New WebSocket connection");
 
 	socket.emit("newUser", "Welcome New User!");
-	socket.on("userMessage", message => {
+	socket.broadcast.emit("newUser", "A new user has joined!");
+
+	socket.on("userMessage", (message) => {
 		io.emit("userMessage", message);
 	});
 
-	// socket.emit("countUpdated", count);
-
-	// socket.on("increment", () => {
-	// 	count++;
-	// 	io.emit("countUpdated", count);
-	// });
+	socket.on("disconnect", () => {
+		io.emit("userDisconnected", "A user has left!");
+	});
 });
 
 const port = process.env.PORT || 5000;
