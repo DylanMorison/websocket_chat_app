@@ -53,7 +53,7 @@ io.on("connection", (socket) => {
 			return callback("Profanity is not allowed!");
 		}
 
-		io.to(user.room).emit("message", generateMessage(message));
+		io.to(user.room).emit("message", generateMessage(user.username, message));
 		callback();
 	});
 
@@ -71,7 +71,10 @@ io.on("connection", (socket) => {
 	socket.on("sendLocation", (lat, long, callback) => {
 		const user = getUser(socket.id);
 		const url = `https://google.com/maps?q=${lat},${long}`;
-		io.to(user.room).emit("locationMessage", generateLocationMessage(url));
+		io.to(user.room).emit(
+			"locationMessage",
+			generateLocationMessage(user.username, url)
+		);
 		callback();
 	});
 });
