@@ -40,7 +40,7 @@ $messageForm.addEventListener("submit", (e) => {
 
 	const message = document.querySelector("#message").value;
 
-	socket.emit("message", message, (error) => {
+	socket.emit("sendMessage", message, (error) => {
 		$messageFormButton.removeAttribute("disabled");
 		$messageFormInput.value = "";
 		$messageFormInput.focus();
@@ -48,7 +48,7 @@ $messageForm.addEventListener("submit", (e) => {
 			return console.log(error);
 		}
 
-		console.log("Message delivered!");
+		console.log("Message delivered!", message);
 	});
 });
 
@@ -70,4 +70,9 @@ $sendLocationButton.addEventListener("click", () => {
 	});
 });
 
-socket.emit("join", { username, room });
+socket.emit("join", { username, room }, (err) => {
+	if (err) {
+		alert(err);
+		location.href = "/";
+	}
+});

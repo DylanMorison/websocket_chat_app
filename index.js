@@ -4,6 +4,7 @@ const express = require("express");
 const socketio = require("socket.io");
 const Filter = require("bad-words");
 const { generateMessage, generateLocationMessage } = require("./utils/messages");
+const { addUser, removeUser, getUser, getUsersInRoom } = require("./utils/users");
 
 const app = express();
 const server = http.createServer(app);
@@ -24,36 +25,53 @@ io.on("connection", (socket) => {
 	 * @param io.emit: emits to all connections
 	 * @param io.to.emit: emits to everyone in a specific room
 	 * @param socket.broadcast.to.emit: sends messages to every client limited to a room
+	 * @param socket.join: ?
 	 */
-	console.log("New WebSocket connection");
 
-	socket.on("join", ({ username, room }) => {
-		socket.join(room);
+	socket.on("join", ({ username, room }, callback) => {
+		const { error, user } = addUser({ id: socket.id, username, room });
+
+		if (error) {
+			return callback(error);
+		}
+
+		socket.join(user.room);
 
 		socket.emit("message", generateMessage("Welcome!"));
 		socket.broadcast
-			.to(room)
-			.emit("message", generateMessage(`${username} has joined!`));
+			.to(user.room)
+			.emit("message", generateMessage(`${user.username} has joined!`));
+
+		callback();
 	});
 
-	socket.on("message", (message, callback) => {
+	socket.on("sendMessage", (message, callback) => {
+		const user = getUser(socket.id);
 		const filter = new Filter();
 
 		if (filter.isProfane(message)) {
 			return callback("Profanity is not allowed!");
 		}
 
-		io.to('Center City').emit("message", generateMessage(message));
+		io.to(user.room).emit("message", generateMessage(message));
 		callback();
 	});
 
 	socket.on("disconnect", () => {
-		io.emit("message", generateMessage("A user has left!"));
+		const user = removeUser(socket.id);
+
+		if (user) {
+			io.to(user.room).emit(
+				"message",
+				generateMessage(`${user.username} has left!`)
+			);
+		}
 	});
 
 	socket.on("sendLocation", (lat, long, callback) => {
+		const user = getUser(socket.id);
 		const url = `https://google.com/maps?q=${lat},${long}`;
-		io.emit("locationMessage", generateLocationMessage(url));
+		io.to(user.room).emit("locationMessage", generateLocationMessage(url));
 		callback();
 	});
 });

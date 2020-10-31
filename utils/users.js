@@ -42,22 +42,29 @@ const removeUser = (id) => {
 	const index = users.findIndex((user) => user.id === id);
 
 	if (index !== -1) {
-		return users.splice(index, 1);
+		return users.splice(index, 1)[0];
 	}
 };
 
-addUser({
-	id: 22,
-	username: "Dylan",
-	room: "South Philly"
-});
+const getUser = (id) => {
+	return users.find((user) => user.id === id);
+};
 
-console.log(users);
+const getUsersInRoom = (room) => {
+	let usersInRoom = [];
 
-const res = addUser({
-	id: 33,
-	username: "dylan",
-	room: "South Philly"
-});
+	users.forEach((user) => {
+		if (user.room === room.toLowerCase()) {
+			usersInRoom.push(user);
+		}
+	});
 
-console.log(users);
+	return usersInRoom;
+};
+
+module.exports = {
+	addUser,
+	removeUser,
+	getUser,
+	getUsersInRoom
+};
