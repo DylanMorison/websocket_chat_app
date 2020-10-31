@@ -22,11 +22,19 @@ io.on("connection", (socket) => {
 	 * @param socket.emit: emits to connection instancec
 	 * @param socket.broadcast.emit: emits to everyone but current connection instance
 	 * @param io.emit: emits to all connections
+	 * @param io.to.emit: emits to everyone in a specific room
+	 * @param socket.broadcast.to.emit: sends messages to every client limited to a room
 	 */
 	console.log("New WebSocket connection");
 
-	socket.emit("message", generateMessage("Welcome!"));
-	socket.broadcast.emit("newUser", generateMessage("A new user has joined!"));
+	socket.on("join", ({ username, room }) => {
+		socket.join(room);
+
+		socket.emit("message", generateMessage("Welcome!"));
+		socket.broadcast
+			.to(room)
+			.emit("message", generateMessage(`${username} has joined!`));
+	});
 
 	socket.on("message", (message, callback) => {
 		const filter = new Filter();
@@ -35,12 +43,12 @@ io.on("connection", (socket) => {
 			return callback("Profanity is not allowed!");
 		}
 
-		io.emit("message", generateMessage(message));
+		io.to('Center City').emit("message", generateMessage(message));
 		callback();
 	});
 
 	socket.on("disconnect", () => {
-		io.emit("userDisconnected", generateMessage("A user has left!"));
+		io.emit("message", generateMessage("A user has left!"));
 	});
 
 	socket.on("sendLocation", (lat, long, callback) => {

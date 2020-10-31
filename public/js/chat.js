@@ -7,11 +7,13 @@ const $messageFormButton = $messageForm.querySelector("button");
 const $sendLocationButton = document.querySelector("#send-location");
 const $messages = document.querySelector("#messages");
 
-// Templates=>
-
+// Templates
 const messageTemplates = document.querySelector("#message-template").innerHTML;
 const locationMessageTemplate = document.querySelector("#location-message-template")
 	.innerHTML;
+
+// OPtions
+const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix: true });
 
 socket.on("message", (message) => {
 	// console.log(message);
@@ -29,14 +31,6 @@ socket.on("locationMessage", (urlObject) => {
 		createdAt: moment(urlObject.createdAt).format("h:mm a")
 	});
 	$messages.insertAdjacentHTML("beforeend", html);
-});
-
-socket.on("newUser", (message) => {
-	console.log(message);
-});
-
-socket.on("userDisconnected", (message) => {
-	console.log(message);
 });
 
 $messageForm.addEventListener("submit", (e) => {
@@ -75,3 +69,5 @@ $sendLocationButton.addEventListener("click", () => {
 		);
 	});
 });
+
+socket.emit("join", { username, room });
